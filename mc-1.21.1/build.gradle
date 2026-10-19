@@ -1,0 +1,16 @@
+// 1.21.1 is obfuscated, so this uses the remapping plugin and Yarn names.
+plugins {
+    id "fabric-loom" version "${loom_version}"
+}
+
+base { archivesName = "weloveyou-tweaks-1.21.1" }
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.1"
+    mappings "net.fabricmc:yarn:1.21.1+build.3:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.19.3"
+    // The pack's own Fabric API, so the mod is built against what players run.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.116.15+1.21.1"
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }

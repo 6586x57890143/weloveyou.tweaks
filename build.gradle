@@ -1,0 +1,19 @@
+// Shared by both Minecraft versions: one version number, reproducible jars.
+subprojects {
+    version = rootProject.mod_version
+    group = "wly"
+
+    // The same commit builds the same bytes, so a release jar can be rebuilt
+    // and compared. Same reasoning as -trimpath on the Go side of this project.
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
+    plugins.withId("java") {
+        processResources {
+            inputs.property "version", project.version
+            filesMatching("fabric.mod.json") { expand "version": project.version }
+        }
+    }
+}

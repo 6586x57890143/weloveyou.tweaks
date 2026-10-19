@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        maven { url = "https://maven.fabricmc.net/" }
+        gradlePluginPortal()
+    }
+}
+rootProject.name = "weloveyou-tweaks"
+
+// One subproject per Minecraft version. Each builds its own jar against its own
+// Minecraft, Fabric API and Java. The code is a few lines and is duplicated on
+// purpose: 1.21.1 is obfuscated and read through Yarn names, 26.x is not and
+// uses Mojang's, so the same idea is spelled differently in each.
+include "mc-1.21.1", "mc-26.2"
