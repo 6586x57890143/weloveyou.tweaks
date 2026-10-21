@@ -6,6 +6,7 @@ import java.util.List;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Gives vanilla wooden tools stone-equivalent harvest eligibility.
  *
- * Preserves the original mining speeds, default mining speed,
+ * Preserves original mining speeds, default mining speed,
  * damage per block, and creative block-destruction behavior.
  */
 public final class MiningTier implements ModInitializer {
@@ -56,11 +57,17 @@ public final class MiningTier implements ModInitializer {
                                 )
                                 .isPresent();
 
-                            return woodenTierRule
-                                ? Tool.Rule.deniesDrops(
-                                    BlockTags.INCORRECT_FOR_STONE_TOOL
-                                )
-                                : rule;
+                            if (!woodenTierRule) {
+                                return rule;
+                            }
+
+                            return Tool.Rule.deniesDrops(
+                                BuiltInRegistries.BLOCK
+                                    .getTag(
+                                        BlockTags.INCORRECT_FOR_STONE_TOOL
+                                    )
+                                    .orElseThrow()
+                            );
                         })
                         .toList();
 
