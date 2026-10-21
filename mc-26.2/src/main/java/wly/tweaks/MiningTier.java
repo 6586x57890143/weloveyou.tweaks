@@ -15,12 +15,6 @@ import net.minecraft.world.item.component.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Gives vanilla wooden tools stone-equivalent harvest eligibility.
- *
- * Preserves original mining speeds, default mining speed,
- * damage per block, and creative block-destruction behavior.
- */
 public final class MiningTier implements ModInitializer {
     private static final Logger LOG =
         LoggerFactory.getLogger("wly_tweaks");
@@ -35,6 +29,12 @@ public final class MiningTier implements ModInitializer {
     @Override
     public void onInitialize() {
         DefaultItemComponentEvents.MODIFY.register(context -> {
+            var stoneTierBlocks = BuiltInRegistries.BLOCK.asLookup()
+                .get(BlockTags.INCORRECT_FOR_STONE_TOOL)
+                .orElseThrow(() -> new IllegalStateException(
+                    "Missing minecraft:incorrect_for_stone_tool tag"
+                ));
+
             int[] changed = {0};
 
             context.modify(
@@ -57,17 +57,9 @@ public final class MiningTier implements ModInitializer {
                                 )
                                 .isPresent();
 
-                            if (!woodenTierRule) {
-                                return rule;
-                            }
-
-                            return Tool.Rule.deniesDrops(
-                                BuiltInRegistries.BLOCK
-                                    .getTag(
-                                        BlockTags.INCORRECT_FOR_STONE_TOOL
-                                    )
-                                    .orElseThrow()
-                            );
+                            return woodenTierRule
+                                ? Tool.Rule.deniesDrops(stoneTierBlocks)
+                                : rule;
                         })
                         .toList();
 
