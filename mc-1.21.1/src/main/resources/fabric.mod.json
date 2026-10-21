@@ -5,10 +5,17 @@
   "name": "wly tweaks",
   "description": "The weloveyou pack's balance changes that a datapack cannot make.",
   "authors": ["heavywinds"],
-  "contact": { "sources": "https://github.com/6586x57890143/weloveyou.tweaks" },
+  "contact": {
+    "sources": "https://github.com/6586x57890143/weloveyou.tweaks"
+  },
   "license": "MIT",
   "environment": "*",
-  "entrypoints": { "main": ["wly.tweaks.Durability"] },
+  "entrypoints": {
+    "main": [
+      "wly.tweaks.Durability",
+      "wly.tweaks.MiningTier"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.15",
     "minecraft": "1.21.1",
