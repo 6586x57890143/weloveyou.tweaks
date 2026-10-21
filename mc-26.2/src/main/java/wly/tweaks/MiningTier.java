@@ -95,7 +95,7 @@ public final class MiningTier implements ModInitializer {
             );
 
             LOG.info(
-                "wly: stone-equivalent harvest tier applied to {} wooden tools",
+                "wly: stone-equivalent harvest tier applied to {} wooden tools, durability and speed stays the same",
                 changed[0]
             );
         });
