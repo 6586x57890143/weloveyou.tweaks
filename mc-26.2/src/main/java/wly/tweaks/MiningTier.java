@@ -5,12 +5,14 @@ import java.util.List;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.level.block.Block;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +31,6 @@ public final class MiningTier implements ModInitializer {
     @Override
     public void onInitialize() {
         DefaultItemComponentEvents.MODIFY.register(context -> {
-            var stoneTierBlocks = BuiltInRegistries.BLOCK.asLookup()
-                .get(BlockTags.INCORRECT_FOR_STONE_TOOL)
-                .orElseThrow(() -> new IllegalStateException(
-                    "Missing minecraft:incorrect_for_stone_tool tag"
-                ));
-
             int[] changed = {0};
 
             context.modify(
@@ -47,6 +43,22 @@ public final class MiningTier implements ModInitializer {
                         return;
                     }
 
+                    List<Block> stoneTierBlocks =
+                        BuiltInRegistries.BLOCK.stream()
+                            .filter(block ->
+                                block.defaultBlockState().is(
+                                    BlockTags.INCORRECT_FOR_STONE_TOOL
+                                )
+                            )
+                            .toList();
+
+                    HolderSet<Block> stoneTierHolders =
+                        HolderSet.direct(
+                            stoneTierBlocks.stream()
+                                .map(Block::builtInRegistryHolder)
+                                .toList()
+                        );
+
                     List<Tool.Rule> rules = original.rules()
                         .stream()
                         .map(rule -> {
@@ -57,9 +69,13 @@ public final class MiningTier implements ModInitializer {
                                 )
                                 .isPresent();
 
-                            return woodenTierRule
-                                ? Tool.Rule.deniesDrops(stoneTierBlocks)
-                                : rule;
+                            if (!woodenTierRule) {
+                                return rule;
+                            }
+
+                            return Tool.Rule.deniesDrops(
+                                stoneTierHolders
+                            );
                         })
                         .toList();
 
