@@ -17,12 +17,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Gives vanilla wooden tools stone-equivalent harvest eligibility.
  *
- * Keeps each tool's original mining speeds, default mining speed,
- * and damage-per-block value. Only the incorrect-for-drops tier rule
- * is changed.
- *
- * Must run on both client and server because default item components
- * are constructed locally on each side.
+ * Preserves the original mining speeds, default mining speed,
+ * damage per block, and creative block-destruction behavior.
  */
 public final class MiningTier implements ModInitializer {
     private static final Logger LOG =
@@ -43,7 +39,8 @@ public final class MiningTier implements ModInitializer {
             context.modify(
                 WOODEN_TOOLS::contains,
                 (builder, item) -> {
-                    Tool original = item.components().get(DataComponents.TOOL);
+                    Tool original =
+                        item.components().get(DataComponents.TOOL);
 
                     if (original == null) {
                         return;
@@ -54,11 +51,13 @@ public final class MiningTier implements ModInitializer {
                         .map(rule -> {
                             boolean woodenTierRule = rule.blocks()
                                 .unwrapKey()
-                                .filter(BlockTags.INCORRECT_FOR_WOODEN_TOOL::equals)
+                                .filter(
+                                    BlockTags.INCORRECT_FOR_WOODEN_TOOL::equals
+                                )
                                 .isPresent();
 
                             return woodenTierRule
-                                ? Tool.Rule.ofNeverDropping(
+                                ? Tool.Rule.deniesDrops(
                                     BlockTags.INCORRECT_FOR_STONE_TOOL
                                 )
                                 : rule;
@@ -70,7 +69,8 @@ public final class MiningTier implements ModInitializer {
                         new Tool(
                             rules,
                             original.defaultMiningSpeed(),
-                            original.damagePerBlock()
+                            original.damagePerBlock(),
+                            original.canDestroyBlocksInCreative()
                         )
                     );
 
